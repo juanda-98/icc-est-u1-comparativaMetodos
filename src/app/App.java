@@ -1,6 +1,4 @@
 package app;
-import java.util.ArrayList;
-import java.util.List;
 
 import controles.SortPersonaMethods;
 import models.Persona;
@@ -9,38 +7,62 @@ import utils.Benchmarking;
 
 public class App {
     public static Persona[] generarPersonas(int cantidad) {
-            Persona[] personas = new Persona[cantidad];
-
-            for(int i = 0; i < cantidad; i++) {
-                String nombre = "Persona" + (i+1);
-                int edad = (int) (Math.random() * 101);
-                personas[i] = new Persona(nombre, edad);
-            }
-            return personas;
+        Persona[] personas = new Persona[cantidad];
+        for (int i = 0; i < cantidad; i++) {
+            String nombre = "Persona " + (i + 1);
+            int edad = (int) (Math.random() * 101);
+            personas[i] = new Persona(nombre, edad);
         }
-
-        public static void main(String[] args) throws Exception {
+        return personas;
+    }
+ 
+    public static void main(String[] args) {
         int[] tamanos = {10000, 50000, 100000};
-        List<Resultado> resultados = new ArrayList<>();
         SortPersonaMethods sorter = new SortPersonaMethods();
-
-        System.out.println("=== ESCENARIO 1: Arreglo completamente desordenado ===\n");
-
+ 
+        // ── ESCENARIO 1: arreglo completamente desordenado ──────────────────
         for (int size : tamanos) {
-            // Copias independientes para cada algoritmo
-            Persona[] base = generarPersonas(size);
+            Persona[] base           = generarPersonas(size);
             Persona[] copiaInsercion = base.clone();
             Persona[] copiaQuickSort = base.clone();
-
-            // Medir Inserción
-            Resultado resInsercion = Benchmarking.medirTiempo(
+ 
+            Resultado resIns = Benchmarking.medirTiempo(
                     () -> { sorter.insertionSort(copiaInsercion); return null; },
-                    "Inserción",
-                    "Desordenado",
-                    size
-            );
-             resultados.add(resInsercion);
-            System.out.println(resInsercion);
+                    "Inserción", "Desordenado", size);
+ 
+            Resultado resQS = Benchmarking.medirTiempo(
+                    () -> { sorter.quickSort(copiaQuickSort, 0, copiaQuickSort.length - 1); return null; },
+                    "QuickSort", "Desordenado", size);
+ 
+            System.out.println(resIns);
+            System.out.println(resQS);
+        }
+ 
+        // ── ESCENARIO 2: arreglo casi ordenado + 1 nueva persona ────────────
+        for (int size : tamanos) {
+            Persona[] base = generarPersonas(size);
+            sorter.quickSort(base, 0, base.length - 1);   // ordenar base
+ 
+            // nuevo arreglo con una posición extra al final
+            Persona[] baseConNueva = new Persona[size + 1];
+            System.arraycopy(base, 0, baseConNueva, 0, size);
+            baseConNueva[size] = new Persona("Persona " + (size + 1),
+                                             (int)(Math.random() * 101));
+ 
+            Persona[] copiaInsercion = baseConNueva.clone();
+            Persona[] copiaQuickSort = baseConNueva.clone();
+            int newSize = size + 1;
+ 
+            Resultado resIns = Benchmarking.medirTiempo(
+                    () -> { sorter.insertionSort(copiaInsercion); return null; },
+                    "Inserción", "Casi ordenado + 1 persona", newSize);
+ 
+            Resultado resQS = Benchmarking.medirTiempo(
+                    () -> { sorter.quickSort(copiaQuickSort, 0, copiaQuickSort.length - 1); return null; },
+                    "QuickSort", "Casi ordenado + 1 persona", newSize);
+ 
+            System.out.println(resIns);
+            System.out.println(resQS);
         }
     }
 }

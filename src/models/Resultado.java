@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Locale;
+
 public class Resultado {
     private String algoritmo;
     private String escenario;
@@ -37,8 +39,9 @@ public class Resultado {
 
     @Override
     public String toString() {
-        return "Resultado [algoritmo=" + algoritmo + ", escenario=" + escenario + ", sample=" + sample 
-        + ", tiempoMilis=" + tiempoMilis + "]";
+        String tiempoFormateado = String.format(Locale.GERMAN, "%,.3f ms", tiempoMilis);
+        return String.format("%-26s | %-9s | %-6d | %s",
+                escenario, algoritmo, sample, tiempoFormateado);
     }
 
     

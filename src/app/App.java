@@ -41,5 +41,6 @@ public class App {
             );
              resultados.add(resInsercion);
             System.out.println(resInsercion);
+        }
     }
 }
